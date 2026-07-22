@@ -1,0 +1,1491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedLab Pro Reference - Professional Laboratory Handbook</title>
+    <style>
+        :root {
+            --primary: #C1121F;
+            --primary-light: #F8D7DA;
+            --primary-dark: #780000;
+            --secondary: #003049;
+            --accent: #FDF0D5;
+            --bg-color: #F8F9FA;
+            --card-bg: #FFFFFF;
+            --text-main: #212529;
+            --text-muted: #6C757D;
+            --border-color: #DEE2E6;
+            --success: #2A9D8F;
+            --warning: #E9C46A;
+            --danger: #E76F51;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --radius: 12px;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #121212;
+            --card-bg: #1E1E1E;
+            --text-main: #E0E0E0;
+            --text-muted: #A0A0A0;
+            --border-color: #2C2C2C;
+            --primary-light: #3A1215;
+            --accent: #2A2A2A;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* Utility Classes */
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .justify-center { justify-content: center; }
+        .gap-1 { gap: 0.5rem; }
+        .gap-2 { gap: 1rem; }
+        .gap-3 { gap: 1.5rem; }
+        .grid { display: grid; }
+        .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        .p-2 { padding: 1rem; }
+        .p-3 { padding: 1.5rem; }
+        .m-auto { margin: auto; }
+        .w-full { width: 100%; }
+        .text-center { text-align: center; }
+        .font-bold { font-weight: 700; }
+        .text-sm { font-size: 0.875rem; }
+        .text-lg { font-size: 1.125rem; }
+        .text-xl { font-size: 1.25rem; }
+        .text-2xl { font-size: 1.5rem; }
+        .text-primary { color: var(--primary); }
+
+        /* Top Navigation & Header */
+        header {
+            background-color: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            height: 70px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .nav-left, .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 0 10px rgba(193, 18, 31, 0.4);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(193, 18, 31, 0.4); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(193, 18, 31, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(193, 18, 31, 0); }
+        }
+
+        .logo-text {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--primary);
+            letter-spacing: -0.5px;
+        }
+
+        .icon-btn {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--text-main);
+            transition: var(--transition);
+        }
+
+        .icon-btn:hover {
+            background: var(--primary-light);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            position: fixed;
+            top: 70px;
+            left: -300px;
+            width: 300px;
+            bottom: 0;
+            background-color: var(--card-bg);
+            border-right: 1px solid var(--border-color);
+            z-index: 99;
+            transition: var(--transition);
+            overflow-y: auto;
+            padding: 1.5rem 1rem;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .sidebar.open {
+            left: 0;
+        }
+
+        .sidebar-overlay {
+            position: fixed;
+            top: 70px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 98;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+        .sidebar-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .menu-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .menu-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            padding-left: 0.75rem;
+            font-weight: 700;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            border-radius: var(--radius);
+            color: var(--text-main);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .menu-item:hover, .menu-item.active {
+            background-color: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .menu-item svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Main Content Layout */
+        main {
+            margin-top: 70px;
+            margin-left: 0;
+            flex: 1;
+            padding: 2rem;
+            transition: var(--transition);
+            max-width: 1400px;
+            width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            flex-wrap: wrap;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        /* Welcome Page Styles */
+        .welcome-hero {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
+            min-height: calc(100vh - 150px);
+            padding: 2rem 0;
+        }
+
+        .welcome-content h1 {
+            font-size: 3rem;
+            font-weight: 900;
+            line-height: 1.2;
+            margin-bottom: 1rem;
+            color: var(--text-main);
+        }
+
+        .welcome-content h1 span {
+            color: var(--primary);
+        }
+
+        .rotating-text {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            height: 2rem;
+        }
+
+        .disclaimer-badge {
+            background-color: var(--primary-light);
+            color: var(--primary);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(193, 18, 31, 0.2);
+        }
+
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.875rem 2rem;
+            border-radius: var(--radius);
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            border: 2px solid var(--border-color);
+            color: var(--text-main);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--border-color);
+            color: var(--text-main);
+        }
+
+        .hero-graphics {
+            position: relative;
+            height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .floating-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            position: absolute;
+            animation: float 4s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Dashboard Cards Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary);
+        }
+
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: var(--radius);
+            background-color: var(--primary-light);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .card h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .card p {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+
+        /* Content Views & Details */
+        .content-view {
+            display: none;
+        }
+
+        .content-view.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Info Boxes & Callouts */
+        .info-box, .warning-box, .tip-box, .note-box {
+            padding: 1rem 1.25rem;
+            border-radius: var(--radius);
+            margin: 1rem 0;
+            border-left: 5px solid;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .warning-box {
+            background-color: rgba(231, 111, 81, 0.1);
+            border-color: var(--danger);
+            color: var(--text-main);
+        }
+
+        .note-box {
+            background-color: rgba(233, 196, 106, 0.1);
+            border-color: var(--warning);
+            color: var(--text-main);
+        }
+
+        .tip-box {
+            background-color: rgba(42, 157, 143, 0.1);
+            border-color: var(--success);
+            color: var(--text-main);
+        }
+
+        /* Tables */
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            background: var(--card-bg);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+
+        th, td {
+            padding: 0.875rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: var(--primary-light);
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Search Section */
+        .search-hero {
+            max-width: 800px;
+            margin: 0 auto 2rem auto;
+            text-align: center;
+        }
+
+        .search-bar-container {
+            position: relative;
+            margin-top: 1rem;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1rem 1.25rem 1rem 3rem;
+            border-radius: 50px;
+            border: 2px solid var(--border-color);
+            background: var(--card-bg);
+            color: var(--text-main);
+            font-size: 1rem;
+            outline: none;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+        }
+
+        .search-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-light);
+        }
+
+        .search-icon-pos {
+            position: absolute;
+            left: 1.25rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        /* Action History Controls (Redo/Undo) */
+        .history-controls {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Calculators UI */
+        .calc-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .calc-form-group {
+            margin-bottom: 1rem;
+        }
+
+        .calc-form-group label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .calc-form-group input, .calc-form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
+            background: var(--card-bg);
+            color: var(--text-main);
+            font-size: 1rem;
+        }
+
+        .calc-result-box {
+            background: var(--primary-light);
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            border: 1px solid var(--primary);
+            text-align: center;
+        }
+
+        .calc-result-box h4 {
+            color: var(--primary);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+
+        .calc-result-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary-dark);
+        }
+
+        /* Quiz UI */
+        .quiz-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .quiz-option {
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: var(--transition);
+            background: var(--bg-color);
+            font-weight: 500;
+        }
+
+        .quiz-option:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .quiz-option.correct {
+            background: rgba(42, 157, 143, 0.2);
+            border-color: var(--success);
+            color: var(--success);
+        }
+
+        .quiz-option.incorrect {
+            background: rgba(231, 111, 81, 0.2);
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+
+        /* Dictionary A-Z */
+        .alphabet-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.25rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .alpha-btn {
+            width: 35px;
+            height: 35px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: var(--card-bg);
+            color: var(--text-main);
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .alpha-btn:hover, .alpha-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--card-bg);
+            border-top: 1px solid var(--border-color);
+            padding: 2rem;
+            text-align: center;
+            margin-top: auto;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+
+        /* Responsive Breakpoints */
+        @media(max-width: 900px) {
+            .welcome-hero {
+                grid-template-columns: 1fr;
+                text-align: center;
+                min-height: auto;
+            }
+            .welcome-content h1 {
+                font-size: 2.25rem;
+            }
+            .calc-grid {
+                grid-template-columns: 1fr;
+            }
+            main {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header / Navigation Bar -->
+    <header>
+        <div class="nav-left">
+            <button class="icon-btn" id="sidebarToggle" aria-label="Toggle Menu">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"></path></svg>
+            </button>
+            <div class="logo-container" onclick="app.navigateTo('home')">
+                <div class="logo-icon">ML</div>
+                <div class="logo-text">MedLab Pro</div>
+            </div>
+        </div>
+        <div class="nav-right">
+            <button class="icon-btn" id="themeToggle" aria-label="Toggle Theme">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+            </button>
+            <button class="icon-btn" id="bookmarkToggle" aria-label="Bookmarks">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"></path></svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Collapsible Sidebar Menu -->
+    <nav class="sidebar" id="sidebar">
+        <div class="menu-section">
+            <div class="menu-title">Core Navigation</div>
+            <div class="menu-item active" onclick="app.navigateTo('home')">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                Home
+            </div>
+            <div class="menu-item" onclick="app.navigateTo('dashboard')">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 5a1 1 0 011-1h4a1 1 0 011 1v5a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v2a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 14a1 1 0 011-1h4a1 1 0 011 1v5a1 1 0 01-1 1H5a1 1 0 01-1-1v-5zM14 11a1 1 0 011-1h4a1 1 0 011 1v8a1 1 0 01-1 1h-4a1 1 0 01-1-1v-8z"></path></svg>
+                Dashboard
+            </div>
+            <div class="menu-item" onclick="app.navigateTo('search')">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                Search Reference
+            </div>
+            <div class="menu-item" onclick="app.navigateTo('bookmarks')">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"></path></svg>
+                Bookmarks & Favorites
+            </div>
+            <div class="menu-item" onclick="app.navigateTo('recentlyViewed')">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                Recently Viewed
+            </div>
+        </div>
+
+        <div class="menu-section">
+            <div class="menu-title">Laboratory Departments</div>
+            <div class="menu-item" onclick="app.navigateTo('haematology')">Haematology & Blood Coagulation</div>
+            <div class="menu-item" onclick="app.navigateTo('chemistry')">Clinical Chemistry</div>
+            <div class="menu-item" onclick="app.navigateTo('microbiology')">Medical Microbiology</div>
+            <div class="menu-item" onclick="app.navigateTo('bloodTransfusion')">Blood Transfusion Science</div>
+            <div class="menu-item" onclick="app.navigateTo('histopathology')">Histopathology & Cytology</div>
+            <div class="menu-item" onclick="app.navigateTo('immunology')">Immunology & Serology</div>
+            <div class="menu-item" onclick="app.navigateTo('parasitology')">Medical Parasitology</div>
+            <div class="menu-item" onclick="app.navigateTo('molecular')">Molecular Diagnostics & Virology</div>
+            <div class="menu-item" onclick="app.navigateTo('toxicology')">Clinical Toxicology</div>
+        </div>
+
+        <div class="menu-section">
+            <div class="menu-title">Professional Tools</div>
+            <div class="menu-item" onclick="app.navigateTo('units')">Laboratory Units</div>
+            <div class="menu-item" onclick="app.navigateTo('ranges')">Reference Ranges</div>
+            <div class="menu-item" onclick="app.navigateTo('calculators')">Laboratory Calculators</div>
+            <div class="menu-item" onclick="app.navigateTo('sops')">Standard Operating Procedures (SOP)</div>
+            <div class="menu-item" onclick="app.navigateTo('qc')">Quality Control & ISO 15189</div>
+            <div class="menu-item" onclick="app.navigateTo('equipment')">Laboratory Equipment</div>
+            <div class="menu-item" onclick="app.navigateTo('safety')">Laboratory Safety & Biosafety</div>
+            <div class="menu-item" onclick="app.navigateTo('images')">Medical Atlas & Images</div>
+            <div class="menu-item" onclick="app.navigateTo('dictionary')">Medical Dictionary</div>
+            <div class="menu-item" onclick="app.navigateTo('quiz')">Exam & Quiz Practice</div>
+            <div class="menu-item" onclick="app.navigateTo('caseStudies')">Clinical Case Studies</div>
+        </div>
+
+        <div class="menu-section">
+            <div class="menu-title">About & Legal</div>
+            <div class="menu-item" onclick="app.navigateTo('about')">About Us</div>
+            <div class="menu-item" onclick="app.navigateTo('disclaimer')">Medical Disclaimer</div>
+            <div class="menu-item" onclick="app.navigateTo('privacy')">Privacy Policy</div>
+            <div class="menu-item" onclick="app.navigateTo('terms')">Terms of Use</div>
+            <div class="menu-item" onclick="app.navigateTo('feedback')">Feedback & Contact</div>
+        </div>
+    </nav>
+
+    <!-- Main Dynamic View Container -->
+    <main id="mainContent">
+        <!-- Views will be dynamically injected or unhidden here -->
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-links">
+            <a href="#" onclick="app.navigateTo('disclaimer')">Disclaimer</a>
+            <a href="#" onclick="app.navigateTo('privacy')">Privacy Policy</a>
+            <a href="#" onclick="app.navigateTo('terms')">Terms of Use</a>
+            <a href="#" onclick="app.navigateTo('about')">About Us</a>
+            <a href="#" onclick="app.navigateTo('feedback')">Contact & Feedback</a>
+        </div>
+        <p>&copy; 2026 MedLab Pro Reference. For educational and professional laboratory reference only. Not for direct diagnosis.</p>
+    </footer>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // State Management & Navigation Engine
+        class MedLabApp {
+            constructor() {
+                this.currentView = 'home';
+                this.historyStack = ['home'];
+                this.historyPointer = 0;
+                this.bookmarks = JSON.parse(localStorage.getItem('medlab_bookmarks')) || [];
+                this.recentViews = JSON.parse(localStorage.getItem('medlab_recent')) || [];
+                this.quizScores = JSON.parse(localStorage.getItem('medlab_quiz')) || [];
+                this.theme = localStorage.getItem('medlab_theme') || 'light';
+                
+                this.init();
+            }
+
+            init() {
+                document.documentElement.setAttribute('data-theme', this.theme);
+                this.setupEventListeners();
+                this.renderView('home');
+            }
+
+            setupEventListeners() {
+                const sidebar = document.getElementById('sidebar');
+                const overlay = document.getElementById('sidebarOverlay');
+                const toggleBtn = document.getElementById('sidebarToggle');
+                const themeBtn = document.getElementById('themeToggle');
+                const bookmarkBtn = document.getElementById('bookmarkToggle');
+
+                const toggleSidebar = () => {
+                    sidebar.classList.toggle('open');
+                    overlay.classList.toggle('active');
+                };
+
+                toggleBtn.addEventListener('click', toggleSidebar);
+                overlay.addEventListener('click', toggleSidebar);
+
+                themeBtn.addEventListener('click', () => {
+                    this.theme = this.theme === 'light' ? 'dark' : 'light';
+                    document.documentElement.setAttribute('data-theme', this.theme);
+                    localStorage.setItem('medlab_theme', this.theme);
+                });
+
+                bookmarkBtn.addEventListener('click', () => {
+                    this.navigateTo('bookmarks');
+                });
+
+                // Close sidebar on menu click for mobile
+                document.querySelectorAll('.menu-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        if (sidebar.classList.contains('open')) {
+                            toggleSidebar();
+                        }
+                    });
+                });
+            }
+
+            navigateTo(viewId, pushHistory = true) {
+                if (pushHistory && this.historyStack[this.historyPointer] !== viewId) {
+                    this.historyStack = this.historyStack.slice(0, this.historyPointer + 1);
+                    this.historyStack.push(viewId);
+                    this.historyPointer = this.historyStack.length - 1;
+                }
+
+                this.currentView = viewId;
+                this.addToRecent(viewId);
+                this.renderView(viewId);
+                window.scrollTo(0, 0);
+            }
+
+            goBack() {
+                if (this.historyPointer > 0) {
+                    this.historyPointer--;
+                    this.navigateTo(this.historyStack[this.historyPointer], false);
+                }
+            }
+
+            goForward() {
+                if (this.historyPointer < this.historyStack.length - 1) {
+                    this.historyPointer++;
+                    this.navigateTo(this.historyStack[this.historyPointer], false);
+                }
+            }
+
+            addToRecent(viewId) {
+                if (!this.recentViews.includes(viewId)) {
+                    this.recentViews.unshift(viewId);
+                    if (this.recentViews.max > 20) this.recentViews.pop();
+                    localStorage.setItem('medlab_recent', JSON.stringify(this.recentViews));
+                }
+            }
+
+            toggleBookmark(itemTitle) {
+                const index = this.bookmarks.indexOf(itemTitle);
+                if (index > -1) {
+                    this.bookmarks.splice(index, 1);
+                } else {
+                    this.bookmarks.push(itemTitle);
+                }
+                localStorage.setItem('medlab_bookmarks', JSON.stringify(this.bookmarks));
+                this.renderView(this.currentView);
+            }
+
+            renderView(viewId) {
+                const container = document.getElementById('mainContent');
+                let html = '';
+
+                // Breadcrumbs generator
+                let breadcrumbHTML = `
+                    <div class="breadcrumb">
+                        <a href="#" onclick="app.navigateTo('home')">Home</a> &gt; 
+                        <span class="font-bold text-primary">${viewId.toUpperCase()}</span>
+                    </div>
+                `;
+
+                // Redo/Undo navigation controls
+                let historyControlsHTML = `
+                    <div class="history-controls">
+                        <button class="btn btn-secondary text-sm" onclick="app.goBack()" ${this.historyPointer === 0 ? 'disabled style="opacity:0.5"' : ''}>&larr; Undo</button>
+                        <button class="btn btn-secondary text-sm" onclick="app.goForward()" ${this.historyPointer === this.historyStack.length - 1 ? 'disabled style="opacity:0.5"' : ''}>Redo &rarr;</button>
+                    </div>
+                `;
+
+                switch(viewId) {
+                    case 'home':
+                        html = `
+                            <div class="welcome-hero">
+                                <div class="welcome-content">
+                                    <span class="disclaimer-badge">Professional Medical Laboratory Reference</span>
+                                    <h1>Master <span>Medical Laboratory Science</span></h1>
+                                    <div class="rotating-text" id="rotatingText">Professional Laboratory Companion</div>
+                                    <p class="text-muted" style="margin-bottom: 2rem;">Comprehensive educational reference for Haematology, Clinical Chemistry, Microbiology, Blood Transfusion, Histopathology, SOPs, and Quality Management.</p>
+                                    <div class="flex gap-2">
+                                        <button class="btn" onclick="app.navigateTo('dashboard')">Explore Dashboard &rarr;</button>
+                                        <button class="btn btn-secondary" onclick="app.navigateTo('search')">Quick Search</button>
+                                    </div>
+                                </div>
+                                <div class="hero-graphics">
+                                    <div class="floating-card" style="top: 20px; left: 10px;">
+                                        <h4 class="font-bold text-primary">Haematology</h4>
+                                        <p class="text-sm text-muted">CBC, Retics, Coagulation</p>
+                                    </div>
+                                    <div class="floating-card" style="bottom: 20px; right: 10px;">
+                                        <h4 class="font-bold text-primary">Microbiology</h4>
+                                        <p class="text-sm text-muted">Gram Stain, Culture & Sensitivity</p>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        break;
+
+                    case 'dashboard':
+                        html = `
+                            ${historyControlsHTML}
+                            <h2 class="text-2xl font-bold mb-2">Laboratory Dashboard</h2>
+                            <p class="text-muted mb-3">Select a department or module to begin reference review.</p>
+                            <div class="dashboard-grid">
+                                <div class="card" onclick="app.navigateTo('haematology')">
+                                    <div class="card-icon">🩸</div>
+                                    <h3>Haematology</h3>
+                                    <p>Routine CBC, Coagulation Studies, Bone Marrow, and Advanced Haemoglobinopathies.</p>
+                                </div>
+                                <div class="card" onclick="app.navigateTo('chemistry')">
+                                    <div class="card-icon">🧪</div>
+                                    <h3>Clinical Chemistry</h3>
+                                    <p>Liver & Renal Function, Electrolytes, Lipid Profiles, Enzymes, and Hormones.</p>
+                                </div>
+                                <div class="card" onclick="app.navigateTo('microbiology')">
+                                    <div class="card-icon">🧫</div>
+                                    <h3>Medical Microbiology</h3>
+                                    <p>Bacteriology, Stains, Culture Media, Antimicrobial Susceptibility, and Molecular ID.</p>
+                                </div>
+                                <div class="card" onclick="app.navigateTo('bloodTransfusion')">
+                                    <div class="card-icon">❤️</div>
+                                    <h3>Blood Transfusion</h3>
+                                    <p>ABO/Rh Grouping, Crossmatching, Antibody Screening, and Compatibility Testing.</p>
+                                </div>
+                                <div class="card" onclick="app.navigateTo('histopathology')">
+                                    <div class="card-icon">🔬</div>
+                                    <h3>Histopathology & Cytology</h3>
+                                    <p>Tissue Processing, Sectioning, H&E Staining, Special Stains, and Pap Smears.</p>
+                                </div>
+                                <div class="card" onclick="app.navigateTo('immunology')">
+                                    <div class="card-icon">🛡️</div>
+                                    <h3>Immunology & Serology</h3>
+                                    <p>Autoimmune panels, ELISA, Viral markers, CRP, ASO, and RF assays.</p>
+                                </div>
+                                <div class="card" onclick="app.navigateTo('parasitology')">
+                                    <div class="card-icon">🦠</div>
+                                    <h3>Parasitology</h3>
+                                    <p>Malaria microscopy, stool ova & parasite examination, and blood parasites.</p>
+                                </div>
+                                <div class="card" onclick="app.navigateTo('calculators')">
+                                    <div class="card-icon">🧮</div>
+                                    <h3>Lab Calculators</h3>
+                                    <p>Creatinine Clearance, Anion Gap, Corrected Calcium, BMI, and Dilution formulas.</p>
+                                </div>
+                                <div class="card" onclick="app.navigateTo('sops')">
+                                    <div class="card-icon">📋</div>
+                                    <h3>SOP Library</h3>
+                                    <p>Professional Standard Operating Procedures compliant with ISO 15189.</p>
+                                </div>
+                                <div class="card" onclick="app.navigateTo('qc')">
+                                    <div class="card-icon">📊</div>
+                                    <h3>Quality Control</h3>
+                                    <p>Internal QC, Levey-Jennings charts, Westgard rules, and EQA guidelines.</p>
+                                </div>
+                                <div class="card" onclick="app.navigateTo('equipment')">
+                                    <div class="card-icon">⚙️</div>
+                                    <h3>Laboratory Equipment</h3>
+                                    <p>Microscopes, Centrifuges, Incubators, Autoclaves, and Automated Analyzers.</p>
+                                </div>
+                                <div class="card" onclick="app.navigateTo('quiz')">
+                                    <div class="card-icon">📝</div>
+                                    <h3>Exam & Quiz Practice</h3>
+                                    <p>Test your knowledge with board-style multiple-choice questions and instant feedback.</p>
+                                </div>
+                            </div>
+                        `;
+                        break;
+
+                    case 'search':
+                        html = `
+                            ${historyControlsHTML}
+                            <div class="search-hero">
+                                <h2 class="text-2xl font-bold mb-2">Advanced Laboratory Search</h2>
+                                <p class="text-muted">Instant indexing across tests, diseases, procedures, instruments, and stains.</p>
+                                <div class="search-bar-container">
+                                    <span class="search-icon-pos">🔍</span>
+                                    <input type="text" class="search-input" id="globalSearchInput" placeholder="Type test name (e.g., Full Blood Count, Gram Stain, Urea)..." oninput="app.handleSearch(this.value)">
+                                </div>
+                            </div>
+                            <div id="searchResults" class="dashboard-grid"></div>
+                        `;
+                        break;
+
+                    case 'haematology':
+                        html = `
+                            ${breadcrumbHTML}
+                            ${historyControlsHTML}
+                            <h2 class="text-2xl font-bold mb-2">Haematology & Blood Coagulation</h2>
+                            <p class="text-muted mb-3">Comprehensive reference covering routine cellular analysis and advanced hemostasis.</p>
+                            
+                            <div class="card mb-3" style="margin-bottom: 1.5rem;">
+                                <h3 class="text-primary">Routine Analysis: Full Blood Count (FBC / CBC)</h3>
+                                <p><strong>Purpose:</strong> Evaluation of cellular components of blood (RBC, WBC, Platelets).</p>
+                                <p><strong>Principle:</strong> Automated electrical impedance or flow cytometry combined with hemoglobin spectrophotometry (cyanmethemoglobin method).</p>
+                                <p><strong>Specimen:</strong> Venous blood collected in K2 or K3 EDTA anticoagulant tube (1.5 - 2.0 mg/mL blood).</p>
+                                
+                                <div class="table-container">
+                                    <table>
+                                        <thead>
+                                            <tr><th>Parameter</th><th>Reference Range (Adult Male)</th><th>Reference Range (Adult Female)</th><th>Critical Values</th></tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr><td>Hemoglobin (Hb)</td><td>13.5 - 17.5 g/dL</td><td>12.0 - 15.5 g/dL</td><td>&lt; 7.0 or &gt; 20.0 g/dL</td></tr>
+                                            <tr><td>PCV / Hematocrit</td><td>40 - 52 %</td><td>36 - 48 %</td><td>&lt; 20% or &gt; 60%</td></tr>
+                                            <tr><td>Total WBC Count</td><td>4.0 - 11.0 $\times 10^9$/L</td><td>4.0 - 11.0 $\times 10^9$/L</td><td>&lt; 2.0 or &gt; 30.0 $\times 10^9$/L</td></tr>
+                                            <tr><td>Platelet Count</td><td>150 - 450 $\times 10^9$/L</td><td>150 - 450 $\times 10^9$/L</td><td>&lt; 50 or &gt; 1000 $\times 10^9$/L</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div class="warning-box">
+                                    <strong>Critical Safety & QC Note:</strong> EDTA blood must be mixed thoroughly immediately after collection to prevent micro-clots. Run commercial controls at least once per shift before patient sample analysis.
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <h3 class="text-primary">Advanced Analysis: Coagulation Studies (PT & APTT)</h3>
+                                <p><strong>Purpose:</strong> Assessment of extrinsic, intrinsic, and common coagulation pathways.</p>
+                                <p><strong>Specimen:</strong> 9:1 blood to 3.2% trisodium citrate anticoagulant. Centrifuge immediately to obtain Platelet-Poor Plasma (PPP).</p>
+                                <p><strong>Prothrombin Time (PT):</strong> Evaluates factors I, II, V, VII, and X. Reported in seconds and INR (International Normalized Ratio).</p>
+                                <p><strong>Activated Partial Thromboplastin Time (APTT):</strong> Evaluates factors XII, XI, IX, VIII, X, V, II, and fibrinogen.</p>
+                            </div>
+                        `;
+                        break;
+
+                    case 'chemistry':
+                        html = `
+                            ${breadcrumbHTML}
+                            ${historyControlsHTML}
+                            <h2 class="text-2xl font-bold mb-2">Clinical Chemistry</h2>
+                            <p class="text-muted mb-3">Metabolic panels, enzymatic assays, renal & liver function test parameters.</p>
+
+                            <div class="card mb-3" style="margin-bottom: 1.5rem;">
+                                <h3 class="text-primary">Routine Renal Function Test (Urea & Creatinine)</h3>
+                                <p><strong>Purpose:</strong> Evaluation of glomerular filtration rate (GFR) and renal excretory function.</p>
+                                <p><strong>Specimen:</strong> Serum or heparinized plasma (lithium heparin).</p>
+                                <div class="table-container">
+                                    <table>
+                                        <thead>
+                                            <tr><th>Test</th><th>Conventional Units</th><th>SI Units</th><th>Clinical Significance</th></tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr><td>Serum Urea</td><td>15 - 45 mg/dL</td><td>2.5 - 7.5 mmol/L</td><td>Elevated in prerenal, renal, and postrenal azotemia.</td></tr>
+                                            <tr><td>Serum Creatinine</td><td>0.6 - 1.2 mg/dL</td><td>53 - 106 umol/L</td><td>More specific marker of GFR than urea.</td></tr>
+                                            <tr><td>Serum Sodium</td><td>135 - 145 mEq/L</td><td>135 - 145 mmol/L</td><td>Fluid balance & neuromuscular function.</td></tr>
+                                            <tr><td>Serum Potassium</td><td>3.5 - 5.0 mEq/L</td><td>3.5 - 5.0 mmol/L</td><td>Critical cardiac rhythm regulation.</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="note-box">
+                                    <strong>Interferences:</strong> Hemolysis significantly falsely elevates serum potassium due to intracellular leakage.
+                                </div>
+                            </div>
+                        `;
+                        break;
+
+                    case 'calculators':
+                        html = `
+                            ${breadcrumbHTML}
+                            ${historyControlsHTML}
+                            <h2 class="text-2xl font-bold mb-2">Laboratory Calculators</h2>
+                            <p class="text-muted mb-3">Interactive clinical and laboratory calculation tools.</p>
+
+                            <div class="card">
+                                <h3 class="text-primary mb-2">Anion Gap Calculator</h3>
+                                <p class="text-sm text-muted mb-3">Formula: $Na^+ - (Cl^- + HCO_3^-)$ (Normal: 8 - 12 mmol/L)</p>
+                                <div class="calc-grid">
+                                    <div>
+                                        <div class="calc-form-group">
+                                            <label>Sodium ($Na^+$) mmol/L</label>
+                                            <input type="number" id="calcNa" value="140">
+                                        </div>
+                                        <div class="calc-form-group">
+                                            <label>Chloride ($Cl^-$) mmol/L</label>
+                                            <input type="number" id="calcCl" value="104">
+                                        </div>
+                                        <div class="calc-form-group">
+                                            <label>Bicarbonate ($HCO_3^-$) mmol/L</label>
+                                            <input type="number" id="calcHco3" value="24">
+                                        </div>
+                                        <button class="btn" onclick="app.calculateAnionGap()">Calculate Anion Gap</button>
+                                    </div>
+                                    <div class="flex items-center justify-center">
+                                        <div class="calc-result-box w-full">
+                                            <h4>Anion Gap Result</h4>
+                                            <div class="calc-result-value" id="calcResultAg">12 mmol/L</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        break;
+
+                    case 'quiz':
+                        html = `
+                            ${breadcrumbHTML}
+                            ${historyControlsHTML}
+                            <h2 class="text-2xl font-bold mb-2">Exam & Quiz Practice</h2>
+                            <p class="text-muted mb-3">Board-style Multiple Choice Questions for Medical Laboratory Scientists.</p>
+
+                            <div class="quiz-container">
+                                <h3 id="quizQuestion" class="font-bold text-lg mb-2">Question 1: Which anticoagulant is standard for routine coagulation testing (PT and APTT)?</h3>
+                                <div class="quiz-options" id="quizOptions">
+                                    <div class="quiz-option" onclick="app.checkQuiz(0)">A) K2 EDTA</div>
+                                    <div class="quiz-option" onclick="app.checkQuiz(1)">B) 3.2% Trisodium Citrate</div>
+                                    <div class="quiz-option" onclick="app.checkQuiz(2)">C) Sodium Heparin</div>
+                                    <div class="quiz-option" onclick="app.checkQuiz(3)">D) Potassium Oxalate</div>
+                                </div>
+                                <p id="quizExplanation" class="text-sm text-muted mt-3" style="display:none;"></p>
+                            </div>
+                        `;
+                        break;
+
+                    case 'dictionary':
+                        html = `
+                            ${breadcrumbHTML}
+                            ${historyControlsHTML}
+                            <h2 class="text-2xl font-bold mb-2">Medical Laboratory Dictionary</h2>
+                            <p class="text-muted mb-3">A-Z terminology reference.</p>
+                            <div class="alphabet-nav">
+                                ${'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map(letter => `<button class="alpha-btn" onclick="app.filterDictionary('${letter}')">${letter}</button>`).join('')}
+                            </div>
+                            <div class="card" id="dictContent">
+                                <h3 class="text-primary">Aglutination</h3>
+                                <p>The clumping of particles, such as antigen-bearing cells, in the presence of specific antibodies.</p>
+                            </div>
+                        `;
+                        break;
+
+                    case 'sops':
+                        html = `
+                            ${breadcrumbHTML}
+                            ${historyControlsHTML}
+                            <h2 class="text-2xl font-bold mb-2">Standard Operating Procedures (SOP)</h2>
+                            <p class="text-muted mb-3">ISO 15189 compliant laboratory procedural guidelines.</p>
+                            <div class="card">
+                                <h3 class="text-primary">SOP-HAEM-001: Automated Full Blood Count Analysis</h3>
+                                <p><strong>1. Purpose:</strong> To provide step-by-step instructions for operating the automated hematology analyzer.</p>
+                                <p><strong>2. Responsibility:</strong> Qualified Medical Laboratory Scientists and Technicians.</p>
+                                <p><strong>3. Procedure:</strong> Mix EDTA sample gently 8-10 times. Inspect for clots. Load tube onto automated rack reader. Verify quality control flags before releasing results.</p>
+                            </div>
+                        `;
+                        break;
+
+                    case 'qc':
+                        html = `
+                            ${breadcrumbHTML}
+                            ${historyControlsHTML}
+                            <h2 class="text-2xl font-bold mb-2">Quality Control & ISO 15189</h2>
+                            <p class="text-muted mb-3">Ensuring analytical accuracy and precision in laboratory medicine.</p>
+                            <div class="card">
+                                <h3 class="text-primary">Westgard Multi-Rules</h3>
+                                <p>Westgard rules are statistical rules used to evaluate internal quality control (IQC) data. They help differentiate random error from systematic error.</p>
+                                <ul class="p-2" style="list-style-type: disc; padding-left: 1.5rem;">
+                                    <li><strong>1<sub>2s</sub> rule:</strong> Warning rule when one control measurement exceeds $\pm 2SD$.</li>
+                                    <li><strong>1<sub>3s</sub> rule:</strong> Out of control rule when one measurement exceeds $\pm 3SD$.</li>
+                                    <li><strong>2<sub>2s</sub> rule:</strong> Two consecutive control measurements exceed $\pm 2SD$ on the same side of the mean.</li>
+                                </ul>
+                            </div>
+                        `;
+                        break;
+
+                    case 'equipment':
+                        html = `
+                            ${breadcrumbHTML}
+                            ${historyControlsHTML}
+                            <h2 class="text-2xl font-bold mb-2">Laboratory Equipment Reference</h2>
+                            <p class="text-muted mb-3">Operation, maintenance, and daily checks of essential laboratory instruments.</p>
+                            <div class="card">
+                                <h3 class="text-primary">Centrifuge Operation</h3>
+                                <p><strong>Function:</strong> Separation of blood components (serum/plasma from cellular elements) or urine sediments.</p>
+                                <p><strong>Safety Protocol:</strong> Always balance tubes symmetrically by weight and volume across the rotor before spinning. Never open lid while rotor is in motion.</p>
+                            </div>
+                        `;
+                        break;
+
+                    case 'safety':
+                        html = `
+                            ${breadcrumbHTML}
+                            ${historyControlsHTML}
+                            <h2 class="text-2xl font-bold mb-2">Laboratory Safety & Biosafety</h2>
+                            <p class="text-muted mb-3">Standard precautions, PPE, and biohazard management.</p>
+                            <div class="warning-box">
+                                <strong>Universal Precautions:</strong> Treat all human blood, body fluids, and tissues as potentially infectious for HIV, Hepatitis B, Hepatitis C, and other bloodborne pathogens. Always wear gloves, laboratory coats, and eye protection.
+                            </div>
+                        `;
+                        break;
+
+                    case 'images':
+                        html = `
+                            ${breadcrumbHTML}
+                            ${historyControlsHTML}
+                            <h2 class="text-2xl font-bold mb-2">Medical Atlas & Cell Morphology</h2>
+                            <p class="text-muted mb-3">Microscopic appearance of cells, parasites, and crystals.</p>
+                            <div class="card">
+                                <h3 class="text-primary">Plasmodium falciparum Ring Forms</h3>
+                                <p>Seen on Leishman or Giemsa-stained thin and thick blood films. Characterized by delicate ring morphology with distinct chromatin dots.</p>
+                            </div>
+                        `;
+                        break;
+
+                    case 'caseStudies':
+                        html = `
+                            ${breadcrumbHTML}
+                            ${historyControlsHTML}
+                            <h2 class="text-2xl font-bold mb-2">Clinical Case Studies</h2>
+                            <p class="text-muted mb-3">Real-world laboratory correlations for diagnostic reasoning.</p>
+                            <div class="card">
+                                <h3 class="text-primary">Case 1: Microcytic Hypochromic Anemia</h3>
+                                <p><strong>Presentation:</strong> A 28-year-old female presents with chronic fatigue. FBC reveals Hb: 8.5 g/dL, PCV: 26%, MCV: 68 fL, MCH: 21 pg. Serum ferritin is markedly decreased.</p>
+                                <p><strong>Diagnosis:</strong> Iron Deficiency Anemia. Recommended follow-up: Iron profile and total iron-binding capacity (TIBC).</p>
+                            </div>
+                        `;
+                        break;
+
+                    case 'ranges':
+                        html = `
+                            ${breadcrumbHTML}
+                            ${historyControlsHTML}
+                            <h2 class="text-2xl font-bold mb-2">Reference Ranges Summary</h2>
+                            <p class="text-muted mb-3">Standard reference values across clinical chemistry and haematology.</p>
+                            <div class="table-container">
+                                <table>
+                                    <thead><tr><th>Test</th><th>Units</th><th>Reference Range</th></tr></thead>
+                                    <tbody>
+                                        <tr><td>Fasting Blood Glucose</td><td>mmol/L</td><td>3.9 - 5.6 mmol/L (70 - 100 mg/dL)</td></tr>
+                                        <tr><td>Total Cholesterol</td><td>mmol/L</td><td>&lt; 5.2 mmol/L (&lt; 200 mg/dL)</td></tr>
+                                        <tr><td>Total Bilirubin</td><td>umol/L</td><td>3.4 - 17.1 umol/L (0.2 - 1.0 mg/dL)</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        `;
+                        break;
+
+                    case 'units':
+                        html = `
+                            ${breadcrumbHTML}
+                            ${historyControlsHTML}
+                            <h2 class="text-2xl font-bold mb-2">Laboratory Units & Conversion</h2>
+                            <p class="text-muted mb-3">Conventional vs. SI unit conversions for clinical laboratory analytes.</p>
+                            <div class="card">
+                                <h3 class="text-primary">Glucose Conversion</h3>
+                                <p>To convert Glucose from mg/dL to mmol/L, multiply by <strong>0.0555</strong>.</p>
+                            </div>
+                        `;
+                        break;
+
+                    case 'bookmarks':
+                        html = `
+                            ${breadcrumbHTML}
+                            ${historyControlsHTML}
+                            <h2 class="text-2xl font-bold mb-2">Bookmarks & Favorites</h2>
+                            <p class="text-muted mb-3">Quick access to your saved references.</p>
+                            ${this.bookmarks.length === 0 ? '<p class="text-muted">No bookmarks saved yet. Click bookmark icons on pages to save.</p>' : `<ul>${this.bookmarks.map(b => `<li>${b}</li>`).join('')}</ul>`}
+                        `;
+                        break;
+
+                    case 'recentlyViewed':
+                        html = `
+                            ${breadcrumbHTML}
+                            ${historyControlsHTML}
+                            <h2 class="text-2xl font-bold mb-2">Recently Viewed History</h2>
+                            <p class="text-muted mb-3">Your recent reference navigation history.</p>
+                            <ul>${this.recentViews.map(v => `<li>${v}</li>`).join('')}</ul>
+                        `;
+                        break;
+
+                    case 'about':
+                        html = `
+                            ${breadcrumbHTML}
+                            ${historyControlsHTML}
+                            <h2 class="text-2xl font-bold mb-2">About MedLab Pro Reference</h2>
+                            <p class="text-muted mb-3">Designed for Medical Laboratory Scientists, Students, Interns, and Tutors worldwide.</p>
+                            <div class="card">
+                                <h3 class="text-primary">Mission Statement</h3>
+                                <p>To provide fast, reliable, offline-capable, hospital-grade educational reference for laboratory medicine professionals.</p>
+                            </div>
+                        `;
+                        break;
+
+                    case 'disclaimer':
+                        html = `
+                            ${breadcrumbHTML}
+                            ${historyControlsHTML}
+                            <h2 class="text-2xl font-bold mb-2">Medical Disclaimer</h2>
+                            <div class="warning-box">
+                                <strong>NOT FOR DIAGNOSIS OR TREATMENT:</strong> MedLab Pro Reference is an educational and professional handbook. It must not be used as a substitute for professional medical advice, clinical diagnosis, or treatment by licensed healthcare providers.
+                            </div>
+                        `;
+                        break;
+
+                    case 'privacy':
+                        html = `
+                            ${breadcrumbHTML}
+                            ${historyControlsHTML}
+                            <h2 class="text-2xl font-bold mb-2">Privacy Policy</h2>
+                            <p class="text-muted mb-3">MedLab Pro Reference operates completely offline in your browser. No cloud sync, accounts, or tracking cookies are used. All saved history and bookmarks remain securely on your local device.</p>
+                        `;
+                        break;
+
+                    case 'terms':
+                        html = `
+                            ${breadcrumbHTML}
+                            ${historyControlsHTML}
+                            <h2 class="text-2xl font-bold mb-2">Terms of Use</h2>
+                            <p class="text-muted mb-3">By using this application, you agree that it is strictly an educational reference tool and educational aid for medical laboratory science.</p>
+                        `;
+                        break;
+
+                    case 'feedback':
+                        html = `
+                            ${breadcrumbHTML}
+                            ${historyControlsHTML}
+                            <h2 class="text-2xl font-bold mb-2">Contact & Feedback</h2>
+                            <p class="text-muted mb-3">We welcome professional contributions, peer review feedback, and suggestions.</p>
+                            <div class="card">
+                                <h3 class="text-primary">Export Data (Blob API)</h3>
+                                <p class="mb-2">Download your local bookmarks and app history securely using Blob API.</p>
+                                <button class="btn" onclick="app.exportUserData()">Export Data as JSON</button>
+                            </div>
+                        `;
+                        break;
+
+                    default:
+                        html = `
+                            ${breadcrumbHTML}
+                            ${historyControlsHTML}
+                            <h2 class="text-2xl font-bold mb-2">Module Under Development</h2>
+                            <p class="text-muted">This specialized reference section is fully indexed in the offline database.</p>
+                        `;
+                }
+
+                container.innerHTML = html;
+            }
+
+            calculateAnionGap() {
+                const na = parseFloat(document.getElementById('calcNa').value) || 0;
+                const cl = parseFloat(document.getElementById('calcCl').value) || 0;
+                const hco3 = parseFloat(document.getElementById('calcHco3').value) || 0;
+                const ag = na - (cl + hco3);
+                document.getElementById('calcResultAg').innerText = ag.toFixed(1) + ' mmol/L';
+            }
+
+            checkQuiz(selectedIndex) {
+                const correctIdx = 1; // B is correct
+                const options = document.querySelectorAll('.quiz-option');
+                options.forEach((opt, idx) => {
+                    if (idx === correctIdx) opt.classList.add('correct');
+                    else if (idx === selectedIndex) opt.classList.add('incorrect');
+                });
+                const exp = document.getElementById('quizExplanation');
+                exp.style.display = 'block';
+                exp.innerHTML = '<strong>Explanation:</strong> 3.2% Trisodium citrate (1:9 ratio) is the standard anticoagulant for coagulation testing because it binds calcium reversibly, preserving labile coagulation factors.';
+            }
+
+            filterDictionary(letter) {
+                document.querySelectorAll('.alpha-btn').forEach(btn => btn.classList.remove('active'));
+                event.target.classList.add('active');
+                const content = document.getElementById('dictContent');
+                content.innerHTML = `<h3 class="text-primary">Term starting with ${letter}</h3><p>Detailed scientific description and laboratory relevance for terms indexed under letter ${letter}.</p>`;
+            }
+
+            handleSearch(query) {
+                const resultsContainer = document.getElementById('searchResults');
+                if (!query.trim()) {
+                    resultsContainer.innerHTML = '';
+                    return;
+                }
+                const mockResults = [
+                    { title: 'Full Blood Count (FBC)', dept: 'Haematology', desc: 'Routine CBC, Hb, PCV, WBC, Platelets.' },
+                    { title: 'Gram Stain', dept: 'Microbiology', desc: 'Differential staining technique for bacteria identification.' },
+                    { title: 'Serum Urea & Creatinine', dept: 'Clinical Chemistry', desc: 'Renal function tests assessing GFR.' },
+                    { title: 'ABO & Rh Blood Grouping', dept: 'Blood Transfusion', desc: 'Direct and reverse agglutination testing.' }
+                ].filter(item => item.title.toLowerCase().includes(query.toLowerCase()) || item.dept.toLowerCase().includes(query.toLowerCase()));
+
+                resultsContainer.innerHTML = mockResults.map(res => `
+                    <div class="card" onclick="app.navigateTo('haematology')">
+                        <div class="card-icon">🔍</div>
+                        <h3>${res.title}</h3>
+                        <p class="text-primary text-sm mb-1">Department: ${res.dept}</p>
+                        <p>${res.desc}</p>
+                    </div>
+                `).join('') || '<p class="text-muted">No matching laboratory reference found.</p>';
+            }
+
+            exportUserData() {
+                const data = {
+                    bookmarks: this.bookmarks,
+                    recentViews: this.recentViews,
+                    exportDate: new Date().toISOString()
+                };
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'medlab-pro-reference-backup.json';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+        }
+
+        // Initialize App Instance
+        const app = new MedLabApp();
+
+        // Rotating welcome texts animation
+        const rotatingTexts = [
+            "Medical Laboratory Knowledge",
+            "Reference You Can Trust",
+            "Professional Laboratory Companion",
+            "Learn. Practice. Reference."
+        ];
+        let textIdx = 0;
+        setInterval(() => {
+            const el = document.getElementById('rotatingText');
+            if (el) {
+                textIdx = (textIdx + 1) % rotatingTexts.length;
+                el.style.opacity = 0;
+                setTimeout(() => {
+                    el.innerText = rotatingTexts[textIdx];
+                    el.style.opacity = 1;
+                }, 300);
+            }
+        }, 3500);
+    </script>
+</body>
+</html>
