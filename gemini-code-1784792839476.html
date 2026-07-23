@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>ToluNote - Native Experience</title>
+    
+    <!-- PWA & Mobile Meta -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0284c7">
+    <link rel="manifest" href="data:application/json;charset=utf-8,%7B%22name%22%3A%22ToluNote%22%2C%22short_name%22%3A%22ToluNote%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230f172a%22%2C%22theme_color%22%3A%22%230284c7%22%7D">
+
+    <!-- Tailwind CSS (Utilized for robust native styling layers) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        sky: { 500: '#0284c7', 600: '#0284c7' },
+                        surface: { dark: '#0f172a', cardDark: '#1e293b', light: '#f8fafc', cardLight: '#ffffff' }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            -webkit-tap-highlight-color: transparent;
+            box-sizing: border-box;
+            font-family: 'Inter', 'Roboto', sans-serif;
+        }
+        body, html {
+            overscroll-behavior-y: none;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        .safe-top { padding-top: env(safe-area-inset-top); }
+        .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+        
+        /* Custom Native Scrollbar */
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(150,150,150,0.3); border-radius: 4px; }
+
+        /* Animation Keyframes */
+        @keyframes ripple {
+            0% { transform: scale(0); opacity: 0.4; }
+            100% { transform: scale(4); opacity: 0; }
+        }
+        .ripple-effect {
+            position: absolute;
+            borderRadius: 50%;
+            transform: scale(0);
+            animation: ripple 0.6s linear;
+            background-color: rgba(255, 255, 255, 0.4);
+            pointer-events: none;
+        }
+        .animate-fade-in { animation: fadeIn 0.25s ease-out forwards; }
+        .animate-slide-up { animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 flex flex-col h-screen select-none">
+
+    <!-- SPLASH SCREEN / WELCOME -->
+    <div id="splash-screen" class="fixed inset-0 z-50 bg-slate-950 flex flex-col items-center justify-center transition-opacity duration-500">
+        <div class="relative flex items-center justify-center w-24 h-24 mb-6 bg-gradient-to-tr from-sky-500 to-indigo-600 rounded-3xl shadow-2xl shadow-sky-500/30 animate-pulse">
+            <i class="fa-solid fa-pen-nib text-4xl text-white"></i>
+        </div>
+        <h1 class="text-3xl font-bold tracking-tight text-white mb-2">ToluNote</h1>
+        <p id="dynamic-greeting" class="text-sm text-slate-400 mb-8 font-medium">Welcome to your second brain</p>
+        <div class="w-12 h-1.5 bg-slate-800 rounded-full overflow-hidden">
+            <div id="splash-progress" class="w-full h-full bg-sky-500 transform -translate-x-full transition-transform duration-1000"></div>
+        </div>
+    </div>
+
+    <!-- GOOGLE LOGIN OVERLAY (If not authenticated) -->
+    <div id="auth-screen" class="fixed inset-0 z-40 bg-slate-950 flex flex-col items-center justify-center p-6 hidden">
+        <div class="w-full max-w-sm bg-slate-900 border border-slate-800 p-8 rounded-3xl shadow-2xl text-center">
+            <div class="w-16 h-16 bg-sky-500/10 text-sky-400 rounded-2xl flex items-center justify-center mx-auto mb-6 text-2xl">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-white mb-2">Sign in to ToluNote</h2>
+            <p class="text-slate-400 text-sm mb-8">Secure, offline-first notes synced seamlessly across all your devices.</p>
+            <button id="google-login-btn" class="w-full py-3.5 px-4 bg-white hover:bg-slate-100 text-slate-900 font-semibold rounded-xl flex items-center justify-center gap-3 transition-all shadow-lg active:scale-98">
+                <i class="fa-brands fa-google text-lg text-red-500"></i>
+                <span>Continue with Google</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN APP SHELL -->
+    <div id="app-shell" class="flex flex-col h-full w-full overflow-hidden relative hidden">
+        
+        <!-- HEADER -->
+        <header class="safe-top bg-slate-900/80 backdrop-blur-md border-b border-slate-800/60 px-4 py-3 flex items-center justify-between z-20">
+            <div class="flex items-center gap-3">
+                <button id="menu-btn" class="w-10 h-10 rounded-xl hover:bg-slate-800 flex items-center justify-center text-slate-300 active:scale-95 transition-all">
+                    <i class="fa-solid fa-bars text-lg"></i>
+                </button>
+                <h1 id="view-title" class="text-lg font-bold text-white tracking-tight">All Notes</h1>
+            </div>
+            <div class="flex items-center gap-1">
+                <button id="search-toggle-btn" class="w-10 h-10 rounded-xl hover:bg-slate-800 flex items-center justify-center text-slate-300 active:scale-95 transition-all">
+                    <i class="fa-solid fa-magnifying-glass text-base"></i>
+                </button>
+                <button id="view-mode-btn" class="w-10 h-10 rounded-xl hover:bg-slate-800 flex items-center justify-center text-slate-300 active:scale-95 transition-all">
+                    <i class="fa-solid fa-table-cells-large text-base"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- SEARCH BAR (Expandable) -->
+        <div id="search-container" class="px-4 py-2 bg-slate-900 border-b border-slate-800 hidden animate-fade-in z-10">
+            <div class="relative flex items-center">
+                <i class="fa-solid fa-search absolute left-3.5 text-slate-400 text-sm"></i>
+                <input type="text" id="search-input" placeholder="Search titles, tags, content..." class="w-full bg-slate-950 text-white placeholder-slate-500 text-sm rounded-xl pl-10 pr-10 py-2.5 border border-slate-800 focus:outline-none focus:border-sky-500 transition-all">
+                <button id="clear-search-btn" class="absolute right-3 text-slate-400 hover:text-white hidden">
+                    <i class="fa-solid fa-circle-xmark"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- APP CONTENT VIEWPORT -->
+        <main id="main-viewport" class="flex-1 overflow-y-auto relative p-4 pb-24 space-y-3">
+            <!-- Dynamic Notes List / Grid Rendered Here via JavaScript -->
+        </main>
+
+        <!-- FLOATING ACTION BUTTON (FAB) -->
+        <button id="fab-create-note" class="fixed right-5 bottom-20 z-30 w-14 h-14 bg-sky-500 hover:bg-sky-600 text-white rounded-2xl shadow-xl shadow-sky-500/40 flex items-center justify-center text-xl active:scale-95 transition-all">
+            <i class="fa-solid fa-plus"></i>
+        </button>
+
+        <!-- BOTTOM NAVIGATION BAR (Mobile Native feel) -->
+        <nav class="safe-bottom bg-slate-900 border-t border-slate-800 h-16 px-6 flex items-center justify-around z-20">
+            <button class="nav-tab flex flex-col items-center gap-1 text-sky-500" data-target="notes">
+                <i class="fa-solid fa-note-sticky text-lg"></i>
+                <span class="text-[10px] font-medium">Notes</span>
+            </button>
+            <button class="nav-tab flex flex-col items-center gap-1 text-slate-400 hover:text-slate-200" data-target="reminders">
+                <i class="fa-solid fa-bell text-lg"></i>
+                <span class="text-[10px] font-medium">Reminders</span>
+            </button>
+            <button class="nav-tab flex flex-col items-center gap-1 text-slate-400 hover:text-slate-200" data-target="productivity">
+                <i class="fa-solid fa-clock-rotate-left text-lg"></i>
+                <span class="text-[10px] font-medium">Pomodoro</span>
+            </button>
+            <button class="nav-tab flex flex-col items-center gap-1 text-slate-400 hover:text-slate-200" data-target="settings">
+                <i class="fa-solid fa-gear text-lg"></i>
+                <span class="text-[10px] font-medium">Settings</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- COLLAPSIBLE SLIDE DRAWER MENU -->
+    <div id="drawer-backdrop" class="fixed inset-0 bg-black/60 z-40 backdrop-blur-sm hidden transition-opacity opacity-0"></div>
+    <aside id="slide-drawer" class="fixed top-0 bottom-0 left-0 w-80 bg-slate-900 border-r border-slate-800 z-50 transform -translate-x-full transition-transform duration-300 flex flex-col safe-top safe-bottom">
+        <div class="p-6 border-b border-slate-800 flex items-center gap-4">
+            <div id="user-avatar" class="w-12 h-12 rounded-full bg-sky-500/20 text-sky-400 font-bold flex items-center justify-center text-lg">TN</div>
+            <div class="overflow-hidden">
+                <h3 id="user-name" class="font-bold text-white text-sm truncate">Tolu User</h3>
+                <p id="user-email" class="text-xs text-slate-400 truncate">user@tolunote.app</p>
+            </div>
+        </div>
+        <div class="flex-1 overflow-y-auto p-4 space-y-1">
+            <a href="#" class="drawer-item flex items-center gap-3.5 px-4 py-3 rounded-xl bg-sky-500/10 text-sky-400 font-medium text-sm transition-all" data-view="all">
+                <i class="fa-solid fa-notes text-base w-5"></i> All Notes
+            </a>
+            <a href="#" class="drawer-item flex items-center gap-3.5 px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-300 font-medium text-sm transition-all" data-view="favorites">
+                <i class="fa-solid fa-star text-base w-5"></i> Favorites
+            </a>
+            <a href="#" class="drawer-item flex items-center gap-3.5 px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-300 font-medium text-sm transition-all" data-view="archive">
+                <i class="fa-solid fa-box-archive text-base w-5"></i> Archive
+            </a>
+            <a href="#" class="drawer-item flex items-center gap-3.5 px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-300 font-medium text-sm transition-all" data-view="trash">
+                <i class="fa-solid fa-trash text-base w-5"></i> Trash
+            </a>
+            <div class="pt-4 pb-2 px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Categories</div>
+            <div id="drawer-categories" class="space-y-1">
+                <!-- Injected categories -->
+            </div>
+        </div>
+        <div class="p-4 border-t border-slate-800">
+            <button id="logout-btn" class="w-full py-2.5 px-4 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 font-medium text-sm flex items-center justify-center gap-2 transition-all">
+                <i class="fa-solid fa-right-from-bracket"></i> Logout
+            </button>
+        </div>
+    </aside>
+
+    <!-- NOTE EDITOR MODAL / SCREEN -->
+    <div id="note-editor-screen" class="fixed inset-0 bg-slate-950 z-50 flex flex-col transform translate-y-full transition-transform duration-300 safe-top safe-bottom">
+        <header class="px-4 py-3 border-b border-slate-800 flex items-center justify-between bg-slate-900/50">
+            <button id="editor-close-btn" class="w-10 h-10 rounded-xl hover:bg-slate-800 flex items-center justify-center text-slate-300">
+                <i class="fa-solid fa-arrow-left text-lg"></i>
+            </button>
+            <div class="flex items-center gap-2 text-xs text-slate-400">
+                <span id="editor-status">Saved</span>
+            </div>
+            <div class="flex items-center gap-1">
+                <button id="editor-pin-btn" class="w-10 h-10 rounded-xl hover:bg-slate-800 flex items-center justify-center text-slate-300">
+                    <i class="fa-solid fa-thumbtack"></i>
+                </button>
+                <button id="editor-fav-btn" class="w-10 h-10 rounded-xl hover:bg-slate-800 flex items-center justify-center text-slate-300">
+                    <i class="fa-solid fa-star"></i>
+                </button>
+                <button id="editor-ai-btn" class="w-10 h-10 rounded-xl hover:bg-slate-800 flex items-center justify-center text-sky-400">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Formatting Toolbar -->
+        <div class="bg-slate-900 border-b border-slate-800 px-2 py-1.5 flex items-center gap-1 overflow-x-auto">
+            <button class="format-btn p-2 rounded-lg hover:bg-slate-800 text-slate-300 text-xs" data-command="bold"><i class="fa-solid fa-bold"></i></button>
+            <button class="format-btn p-2 rounded-lg hover:bg-slate-800 text-slate-300 text-xs" data-command="italic"><i class="fa-solid fa-italic"></i></button>
+            <button class="format-btn p-2 rounded-lg hover:bg-slate-800 text-slate-300 text-xs" data-command="underline"><i class="fa-solid fa-underline"></i></button>
+            <button class="format-btn p-2 rounded-lg hover:bg-slate-800 text-slate-300 text-xs" data-command="insertUnorderedList"><i class="fa-solid fa-list-ul"></i></button>
+            <button class="format-btn p-2 rounded-lg hover:bg-slate-800 text-slate-300 text-xs" data-command="insertOrderedList"><i class="fa-solid fa-list-ol"></i></button>
+            <button class="format-btn p-2 rounded-lg hover:bg-slate-800 text-slate-300 text-xs" data-command="formatBlock" data-value="blockquote"><i class="fa-solid fa-quote-right"></i></button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-5 flex flex-col space-y-4">
+            <input type="text" id="editor-title" placeholder="Title..." class="w-full bg-transparent text-xl font-bold text-white placeholder-slate-600 focus:outline-none">
+            <div id="editor-content" contenteditable="true" class="flex-1 w-full bg-transparent text-slate-200 placeholder-slate-600 focus:outline-none leading-relaxed text-base min-h-[250px]"></div>
+        </div>
+
+        <div class="px-4 py-2 bg-slate-900 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
+            <span id="editor-meta">0 words • 0 chars</span>
+            <div class="flex gap-3">
+                <button id="editor-share-btn" class="hover:text-white"><i class="fa-solid fa-share-nodes"></i> Share</button>
+                <button id="editor-delete-btn" class="hover:text-red-400"><i class="fa-solid fa-trash"></i> Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPT LOGIC -->
+    <script>
+        /**
+         * ToluNote - Core Logic (ES2024 Vanilla Architecture)
+         */
+
+        // State Management
+        const state = {
+            user: null,
+            notes: [],
+            currentView: 'all',
+            currentCategory: null,
+            searchQuery: '',
+            activeNoteId: null,
+            viewMode: 'grid', // grid or list
+            quotes: [
+                "Simplicity is the ultimate sophistication. — Leonardo da Vinci",
+                "Your mind is for having ideas, not holding them. — David Allen",
+                "Action is the foundational key to all success. — Pablo Picasso",
+                "Focus on being productive instead of busy. — Tim Ferriss"
+            ]
+        };
+
+        // DOM Elements
+        const splashScreen = document.getElementById('splash-screen');
+        const authScreen = document.getElementById('auth-screen');
+        const appShell = document.getElementById('app-shell');
+        const mainViewport = document.getElementById('main-viewport');
+        const searchContainer = document.getElementById('search-container');
+        const searchInput = document.getElementById('search-input');
+        const slideDrawer = document.getElementById('slide-drawer');
+        const drawerBackdrop = document.getElementById('drawer-backdrop');
+        const noteEditorScreen = document.getElementById('note-editor-screen');
+        const editorTitle = document.getElementById('editor-title');
+        const editorContent = document.getElementById('editor-content');
+        const dynamicGreeting = document.getElementById('dynamic-greeting');
+
+        // Initialization & Splash sequence
+        window.addEventListener('DOMContentLoaded', () => {
+            initSplash();
+            loadStorage();
+            setupEventListeners();
+        });
+
+        function initSplash() {
+            // Set Dynamic Greeting
+            const hour = new Date().getHours();
+            let greet = "Good Evening";
+            if (hour < 12) greet = "Good Morning";
+            else if (hour < 18) greet = "Good Afternoon";
+            
+            const randomQuote = state.quotes[Math.floor(Math.random() * state.quotes.length)];
+            dynamicGreeting.innerHTML = `${greet} • <span class="italic text-slate-500">"${randomQuote}"</span>`;
+
+            setTimeout(() => {
+                document.getElementById('splash-progress').style.transform = 'translateX(0)';
+            }, 100);
+
+            setTimeout(() => {
+                splashScreen.style.opacity = '0';
+                setTimeout(() => {
+                    splashScreen.style.display = 'none';
+                    checkAuth();
+                }, 500);
+            }, 1800);
+        }
+
+        function checkAuth() {
+            const savedUser = localStorage.getItem('tolunote_user');
+            if (savedUser) {
+                state.user = JSON.parse(savedUser);
+                appShell.classList.remove('hidden');
+                renderApp();
+            } else {
+                authScreen.classList.remove('hidden');
+            }
+        }
+
+        // Mock Google Login Integration
+        document.getElementById('google-login-btn').addEventListener('click', () => {
+            const mockUser = {
+                name: "Tolu Ade",
+                email: "tolu.developer@tolunote.app",
+                avatar: "TA"
+            };
+            localStorage.setItem('tolunote_user', JSON.stringify(mockUser));
+            state.user = mockUser;
+            authScreen.classList.add('hidden');
+            appShell.classList.remove('hidden');
+            
+            // Seed initial note if empty
+            if (state.notes.length === 0) {
+                state.notes.push({
+                    id: Date.now().toString(),
+                    title: "Welcome to ToluNote 🚀",
+                    content: "This is your premium native-feel offline note app. Built with vanilla JavaScript, modern CSS, and packed with high-end features.",
+                    category: "Personal",
+                    pinned: true,
+                    favorite: true,
+                    archived: false,
+                    trashed: false,
+                    updatedAt: Date.now()
+                });
+                saveStorage();
+            }
+            renderApp();
+        });
+
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            localStorage.removeItem('tolunote_user');
+            location.reload();
+        });
+
+        // Storage Handlers
+        function saveStorage() {
+            localStorage.setItem('tolunote_notes', JSON.stringify(state.notes));
+        }
+
+        function loadStorage() {
+            const notes = localStorage.getItem('tolunote_notes');
+            if (notes) {
+                state.notes = JSON.parse(notes);
+            }
+        }
+
+        // Event Listeners Setup
+        function setupEventListeners() {
+            // Menu Drawer Toggles
+            document.getElementById('menu-btn').addEventListener('click', toggleDrawer);
+            drawerBackdrop.addEventListener('click', toggleDrawer);
+
+            // Search Toggles
+            document.getElementById('search-toggle-btn').addEventListener('click', () => {
+                searchContainer.classList.toggle('hidden');
+                if (!searchContainer.classList.contains('hidden')) {
+                    searchInput.focus();
+                }
+            });
+
+            searchInput.addEventListener('input', (e) => {
+                state.searchQuery = e.target.value.toLowerCase();
+                renderNotesList();
+            });
+
+            // View Mode Toggle
+            document.getElementById('view-mode-btn').addEventListener('click', () => {
+                state.viewMode = state.viewMode === 'grid' ? 'list' : 'grid';
+                renderNotesList();
+            });
+
+            // FAB Create Note
+            document.getElementById('fab-create-note').addEventListener('click', () => openEditor());
+
+            // Editor Actions
+            document.getElementById('editor-close-btn').addEventListener('click', closeEditor);
+            
+            editorTitle.addEventListener('input', debounceAutoSave, 300);
+            editorContent.addEventListener('input', debounceAutoSave, 300);
+
+            // Formatting Buttons
+            document.querySelectorAll('.format-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const cmd = btn.getAttribute('data-command');
+                    const val = btn.getAttribute('data-value') || null;
+                    document.execCommand(cmd, false, val);
+                });
+            });
+
+            // Drawer Navigation triggers
+            document.querySelectorAll('.drawer-item').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    document.querySelectorAll('.drawer-item').forEach(i => i.classList.remove('bg-sky-500/10', 'text-sky-400'));
+                    item.classList.add('bg-sky-500/10', 'text-sky-400');
+                    state.currentView = item.getAttribute('data-view');
+                    document.getElementById('view-title').innerText = item.innerText.trim();
+                    toggleDrawer();
+                    renderNotesList();
+                });
+            });
+        }
+
+        function toggleDrawer() {
+            const isOpen = !slideDrawer.classList.contains('-translate-x-full');
+            if (isOpen) {
+                slideDrawer.classList.add('-translate-x-full');
+                drawerBackdrop.classList.add('opacity-0');
+                setTimeout(() => drawerBackdrop.classList.add('hidden'), 300);
+            } else {
+                drawerBackdrop.classList.remove('hidden');
+                setTimeout(() => drawerBackdrop.classList.remove('opacity-0'), 10);
+                slideDrawer.classList.remove('-translate-x-full');
+            }
+        }
+
+        // Main Rendering Pipeline
+        function renderApp() {
+            renderNotesList();
+            renderCategoriesDrawer();
+        }
+
+        function renderNotesList() {
+            mainViewport.innerHTML = '';
+            
+            let filtered = state.notes.filter(note => {
+                if (state.currentView === 'favorites' && !note.favorite) return false;
+                if (state.currentView === 'archive' && !note.archived) return false;
+                if (state.currentView === 'trash' && !note.trashed) return false;
+                if (state.currentView === 'all' && (note.archived || note.trashed)) return false;
+                
+                if (state.searchQuery) {
+                    const matchTitle = note.title.toLowerCase().includes(state.searchQuery);
+                    const matchContent = note.content.toLowerCase().includes(state.searchQuery);
+                    return matchTitle || matchContent;
+                }
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                mainViewport.innerHTML = `
+                    <div class="flex flex-col items-center justify-center h-64 text-slate-500 space-y-3">
+                        <i class="fa-solid fa-box-open text-4xl"></i>
+                        <p class="text-sm font-medium">No notes found here yet</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const containerClass = state.viewMode === 'grid' 
+                ? 'grid grid-cols-2 gap-3' 
+                : 'flex flex-col space-y-2.5';
+            
+            const listWrapper = document.createElement('div');
+            listWrapper.className = containerClass;
+
+            filtered.forEach(note => {
+                const card = document.createElement('div');
+                card.className = `p-4 rounded-2xl bg-slate-900 border border-slate-800/80 hover:border-slate-700 transition-all cursor-pointer relative group flex flex-col justify-between shadow-sm active:scale-98`;
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-center justify-between mb-1.5">
+                            <h3 class="font-semibold text-white text-sm tracking-tight truncate">${note.title || 'Untitled'}</h3>
+                            ${note.pinned ? '<i class="fa-solid fa-thumbtack text-xs text-sky-400"></i>' : ''}
+                        </div>
+                        <p class="text-slate-400 text-xs line-clamp-3 leading-relaxed">${stripHtml(note.content)}</p>
+                    </div>
+                    <div class="mt-4 flex items-center justify-between text-[10px] text-slate-500 font-medium">
+                        <span>${formatDate(note.updatedAt)}</span>
+                        <span class="px-2 py-0.5 rounded-full bg-slate-800 text-slate-300">${note.category || 'Personal'}</span>
+                    </div>
+                `;
+                card.addEventListener('click', () => openEditor(note.id));
+                listWrapper.appendChild(card);
+            });
+
+            mainViewport.appendChild(listWrapper);
+        }
+
+        function renderCategoriesDrawer() {
+            const container = document.getElementById('drawer-categories');
+            const categories = ['Personal', 'Work', 'Ideas', 'Finance', 'Projects'];
+            container.innerHTML = categories.map(cat => `
+                <a href="#" class="flex items-center justify-between px-4 py-2.5 rounded-xl hover:bg-slate-800 text-slate-400 text-sm transition-all" onclick="filterByCategory('${cat}')">
+                    <span>${cat}</span>
+                    <span class="text-xs bg-slate-800 px-2 py-0.5 rounded-full">${state.notes.filter(n => n.category === cat && !n.trashed).length}</span>
+                </a>
+            `).join('');
+        }
+
+        // Editor Control Flow
+        function openEditor(noteId = null) {
+            state.activeNoteId = noteId;
+            if (noteId) {
+                const note = state.notes.find(n => n.id === noteId);
+                editorTitle.value = note.title;
+                editorContent.innerHTML = note.content;
+            } else {
+                editorTitle.value = '';
+                editorContent.innerHTML = '';
+            }
+            noteEditorScreen.classList.remove('translate-y-full');
+            updateEditorMeta();
+        }
+
+        function closeEditor() {
+            saveCurrentNote();
+            noteEditorScreen.classList.add('translate-y-full');
+            state.activeNoteId = null;
+            renderApp();
+        }
+
+        let saveTimeout;
+        function debounceAutoSave() {
+            document.getElementById('editor-status').innerText = 'Unsaved...';
+            clearTimeout(saveTimeout);
+            saveTimeout = setTimeout(() => {
+                saveCurrentNote();
+                document.getElementById('editor-status').innerText = 'Saved';
+            }, 600);
+            updateEditorMeta();
+        }
+
+        function saveCurrentNote() {
+            const title = editorTitle.value.trim();
+            const content = editorContent.innerHTML.trim();
+            if (!title && !content) return;
+
+            if (state.activeNoteId) {
+                const note = state.notes.find(n => n.id === state.activeNoteId);
+                if (note) {
+                    note.title = title;
+                    note.content = content;
+                    note.updatedAt = Date.now();
+                }
+            } else {
+                const newNote = {
+                    id: Date.now().toString(),
+                    title: title || 'Untitled Note',
+                    content: content,
+                    category: 'Personal',
+                    pinned: false,
+                    favorite: false,
+                    archived: false,
+                    trashed: false,
+                    updatedAt: Date.now()
+                };
+                state.notes.unshift(newNote);
+                state.activeNoteId = newNote.id;
+            }
+            saveStorage();
+        }
+
+        function updateEditorMeta() {
+            const text = editorContent.innerText || '';
+            const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+            const chars = text.length;
+            document.getElementById('editor-meta').innerText = `${words} words • ${chars} chars`;
+        }
+
+        // Utilities
+        function stripHtml(html) {
+            const tmp = document.createElement('DIV');
+            tmp.innerHTML = html;
+            return tmp.textContent || tmp.innerText || '';
+        }
+
+        function formatDate(timestamp) {
+            const date = new Date(timestamp);
+            return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+        }
+
+        function filterByCategory(cat) {
+            state.currentCategory = cat;
+            document.getElementById('view-title').innerText = cat;
+            toggleDrawer();
+            renderNotesList();
+        }
+    </script>
+</body>
+</html>
